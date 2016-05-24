@@ -24,10 +24,28 @@ public class AppThread extends Thread {
         while (!Thread.interrupted()){
             switch (appState){
                 case LOADING:
-
+                    //load
+                    setAppState(AppState.CAMERA);
                     break;
                 case CAMERA:
-
+                    c = sh.lockCanvas(null);
+                    try {
+                        synchronized (sh) {
+                            appView.draw(c);
+                        }
+                    } catch (Exception e) {
+                    } finally {
+                        if (c != null) {
+                            sh.unlockCanvasAndPost(c);
+                        }
+                    }
+                    // Set the approximate frame rate by setting this delay
+                    try {
+                        Thread.sleep(20); //50fps
+                    } catch (InterruptedException e) {
+                        // Thread was interrupted while sleeping.
+                        return;
+                    }
                     break;
                 case RECORD:
 

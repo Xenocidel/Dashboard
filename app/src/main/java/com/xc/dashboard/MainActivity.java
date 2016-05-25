@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mCameraManager = (CameraManager)getSystemService(CAMERA_SERVICE);
+        //mCameraManager = (CameraManager)getSystemService(CAMERA_SERVICE);
     }
 
     protected void onResume() {
@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         int numCams = 0;
         String[] tmp;
         try{
-            tmp = mCameraManager.getCameraIdList();
-            numCams = tmp.length;
+            //tmp = mCameraManager.getCameraIdList();
+            //numCams = tmp.length;
             if (numCams > 0){
                 //open camera
             }

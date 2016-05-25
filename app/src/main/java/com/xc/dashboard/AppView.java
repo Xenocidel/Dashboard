@@ -61,7 +61,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
             loaded = true;
         }
         if (Math.abs(accelZ) > accelThreshold && (Math.abs(accelX) > accelThreshold || Math.abs(accelY) > accelThreshold)) {
-            accelString = "!";
+            accelString = "High Motion Detected! Taking photos...";
             Log.i("jerk", ""+accelZ);
             jerkCounter++;
         }

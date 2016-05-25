@@ -1,15 +1,12 @@
 package com.xc.dashboard;
 
-import android.graphics.Camera;
+import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,8 +19,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private AppView appView;
-    private CameraManager mCameraManager;
     private Camera mCamera;
+    private Camera.Parameters mParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,45 +37,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //mCameraManager = (CameraManager)getSystemService(CAMERA_SERVICE);
     }
 
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
-        int numCams = 0;
-        String[] tmp;
-        try{
-            //tmp = mCameraManager.getCameraIdList();
-            //numCams = tmp.length;
-            if (numCams > 0){
-                //open camera
-            }
-        }
-        catch (Exception e){
-            Toast.makeText(MainActivity.this, "Camera Error!", Toast.LENGTH_SHORT).show();
-            numCams = -1;
-        }
-        finally{
-            if (numCams<=0){
-                finish();
-            }
-        }
+        loadSensor();
     }
 
     protected void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(this);
-        Log.i("Dashboard", "Sensors Unloaded");
+        unloadSensor();
     }
 
     public void loadSensor(){
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        try{
+            mCamera = Camera.open();
+            mCamera.setPreviewDisplay(appView.getHolder());
+            mCamera.startPreview();
+            mParams = mCamera.getParameters();
+        }
+        catch (Exception e){
+            Toast.makeText(MainActivity.this, "Camera Error! Exiting...", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     public void unloadSensor(){
         mSensorManager.unregisterListener(this);
-        Log.i("Dashboard", "Sensors Unloaded");
+        mCamera.release();
+        mCamera = null;
+        Log.i("Dashboard", "Sensors and Camera Unloaded");
     }
 
     @Override

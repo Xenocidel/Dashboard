@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 /**
  * Created by Aaron on 2016-05-23.
@@ -86,8 +88,8 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
                 break;
             case CAMERA:
-                canvas.drawColor(Color.BLACK);
-                p.setTextSize(getHeight()/8);
+                //canvas.drawColor(Color.BLACK);
+                p.setTextSize(getHeight() / 12);
                 p.setTextAlign(Paint.Align.LEFT);
                 p.setAntiAlias(true);
                 if (jerkNotify >= 0){
@@ -108,8 +110,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         if (!loaded) {
             appThread = new AppThread(this);
             appThread.start();
+            ((MainActivity)context).loadSensor();
             loaded = true;
         }
+
     }
 
     @Override

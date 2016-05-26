@@ -41,6 +41,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         p = new Paint();
     }
 
+    public Camera mCamera;
     Context context;
     Switch jerkDetectionEnable;
     boolean loaded;
@@ -110,10 +111,28 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         if (!loaded) {
             appThread = new AppThread(this);
             appThread.start();
-            ((MainActivity)context).loadSensor();
+            loadCamera(holder);
             loaded = true;
         }
+    }
 
+    public void loadCamera(SurfaceHolder holder){
+        mCamera = Camera.open();
+
+        try{
+            mCamera.setPreviewDisplay(holder); // problem is here
+            Log.i("Dashboard", "Camera display preview set");
+            mCamera.startPreview();
+            Log.i("Camera", "Loaded");
+        }
+        catch (Exception e){
+            Toast t = Toast.makeText(context, "Camera Error! Exiting...", Toast.LENGTH_SHORT);
+            t.show();
+            Log.d("Camera", "Error "+e.toString());
+            /*mCamera.release();
+            mCamera = null;*/
+            ((MainActivity)context).finish();
+        }
     }
 
     @Override
@@ -123,6 +142,8 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera = null;
     }
 }

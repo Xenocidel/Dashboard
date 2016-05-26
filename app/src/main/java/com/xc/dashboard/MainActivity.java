@@ -19,7 +19,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private AppView appView;
-    public Camera mCamera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,38 +39,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onResume() {
         super.onResume();
-        //loadSensor();
+        loadSensor();
     }
 
     protected void onPause() {
         super.onPause();
-        //unloadSensor();
+        unloadSensor();
     }
 
     public void loadSensor(){
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
-        try{
-            mCamera = Camera.open();
-            mCamera.setPreviewDisplay(appView.getHolder());
-            mCamera.startPreview();
-            Log.i("Camera", "Loaded");
-        }
-        catch (Exception e){
-            Toast t = Toast.makeText(this, "Camera Error! Exiting...", Toast.LENGTH_SHORT);
-            Log.d("Camera", "Error "+e.toString());
-            t.show();
-            finish();
-        }
     }
 
     public void unloadSensor(){
         mSensorManager.unregisterListener(this);
-        if (mCamera != null) {
-            mCamera.stopPreview();
-            mCamera.release();
-            mCamera = null;
-        }
-        Log.i("Dashboard", "Sensors and Camera Unloaded");
+        Log.i("Dashboard", "Sensors Unloaded");
     }
 
     @Override

@@ -14,32 +14,35 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
  * Created by Aaron on 2016-05-23.
  */
 public class AppView extends SurfaceView implements SurfaceHolder.Callback {
+
     public AppView(final Context context) {
+        this(context, null);
+    }
+
+    public AppView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public AppView(Context context, AttributeSet attrs, int defStyle) {
         super(context) ;
         this.context = context;
         getHolder (). addCallback(this);
         setFocusable(true);
         loaded = false;
+        speedString = (TextView)findViewById(R.id.speedometer);
         jerkCounter = 0;
         jerkNotify = -1;
-        /*jerkDetectionEnable = (Switch)findViewById(R.id.switch1);
-        jerkDetectionEnable.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    ((MainActivity)context).loadSensor();
-                } else {
-                    ((MainActivity)context).unloadSensor();
-                }
-            }
-        });*/
         p = new Paint();
     }
+
+
 
     public Camera mCamera;
     Context context;
@@ -47,7 +50,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
     boolean loaded;
     AppThread appThread;
     Paint p;
-    String speedString;
+    TextView speedString;
     String accelString;
     float speed;
     float accelX;
@@ -63,6 +66,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
             appThread = new AppThread(this);
             loaded = true;
         }
+
         if (Math.abs(accelZ) > accelThreshold && (Math.abs(accelX) > accelThreshold || Math.abs(accelY) > accelThreshold)) {
             accelString = "High Motion Detected! Taking photos...";
             Log.i("jerk", ""+accelZ);

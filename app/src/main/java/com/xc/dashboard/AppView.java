@@ -16,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 /**
  * Created by Aaron on 2016-05-23.
@@ -32,9 +33,11 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
     public AppView(Context context, AttributeSet attrs, int defStyle) {
         super(context) ;
+        Log.d("Dashboard", "AppView constructed");
         this.context = context;
         getHolder (). addCallback(this);
         setFocusable(true);
+        ((MainActivity)context).appView = this;
         loaded = false;
         speedString = (TextView)findViewById(R.id.speedometer);
         jerkCounter = 0;
@@ -68,7 +71,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         if (Math.abs(accelZ) > accelThreshold && (Math.abs(accelX) > accelThreshold || Math.abs(accelY) > accelThreshold)) {
-            accelString = "High Motion Detected! Taking photos...";
+            accelString = "High Motion Detected!";
             Log.i("jerk", ""+accelZ);
             jerkCounter++;
         }
@@ -88,12 +91,27 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
     public void draw(Canvas canvas){
         super.draw(canvas);
         update();
-        switch(appThread.getAppState()){
+        canvas.drawColor(Color.TRANSPARENT);
+        p.setTextSize(getHeight() / 12);
+        p.setTextAlign(Paint.Align.RIGHT);
+        p.setAntiAlias(true);
+        if (jerkNotify >= 0){
+            p.setColor(Color.RED);
+            canvas.drawText(accelString, getWidth()-10, getHeight()/8, p);
+        }
+        /*switch(appThread.getAppState()){
             case LOADING:
 
                 break;
             case CAMERA:
                 //canvas.drawColor(Color.BLACK);
+                ToggleButton metric = (ToggleButton)findViewById(R.id.metric);
+                if (metric.isChecked()){
+                    canvas.drawColor(Color.LTGRAY);
+                }
+                else{
+                    canvas.drawColor(Color.RED);
+                }
                 p.setTextSize(getHeight() / 12);
                 p.setTextAlign(Paint.Align.LEFT);
                 p.setAntiAlias(true);
@@ -105,7 +123,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
                 break;
             case RECORD:
                 break;
-        }
+        }*/
 
     }
 
@@ -115,7 +133,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         if (!loaded) {
             appThread = new AppThread(this);
             appThread.start();
-            loadCamera(holder);
+            //loadCamera(holder);
             loaded = true;
         }
     }
@@ -146,8 +164,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mCamera.stopPreview();
-        mCamera.release();
-        mCamera = null;
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
     }
 }

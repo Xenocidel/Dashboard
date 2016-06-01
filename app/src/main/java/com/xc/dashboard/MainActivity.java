@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private AppView appView;
+    public AppView appView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +29,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        appView = new AppView(this);
         setContentView(R.layout.activity_main);
-
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
@@ -60,9 +58,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER){
             return;
         }
-        appView.accelX = event.values[0];
-        appView.accelY = event.values[1];
-        appView.accelZ = event.values[2];
+        if (appView != null) {
+            Log.d("Sensor", "onSensorChanged");
+            appView.accelX = event.values[0];
+            appView.accelY = event.values[1];
+            appView.accelZ = event.values[2];
+        }
     }
 
     @Override

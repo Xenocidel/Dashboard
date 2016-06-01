@@ -1,5 +1,6 @@
 package com.xc.dashboard;
 
+import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -7,6 +8,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +21,8 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
     private SensorManager mSensorManager;
+    private LocationManager mLocationManager;
+    private LocationListener mLocationListener;
     private Sensor mAccelerometer;
     public AppView appView;
 
@@ -30,8 +36,41 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.activity_main);
+
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                //called when location is updated
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+        mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        try{
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 2, mLocationListener);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 2, mLocationListener);
+        }
+        catch(SecurityException e){
+            Toast t = Toast.makeText(this, "Please enable location services", Toast.LENGTH_LONG);
+            t.show();
+            Log.d("Location", e.toString());
+        }
+
     }
 
     protected void onResume() {

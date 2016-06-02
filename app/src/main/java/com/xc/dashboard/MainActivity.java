@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         try{
             mCamera = Camera.open();
-        } catch (Exception e){}
+        } catch (Exception e){ }
 
         if(mCamera != null) {
             mCameraView = new CameraView(this, mCamera);

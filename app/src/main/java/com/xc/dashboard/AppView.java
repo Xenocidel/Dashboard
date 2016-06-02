@@ -47,7 +47,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 
-    public Camera mCamera;
+   // public Camera mCamera;
     Context context;
     Switch jerkDetectionEnable;
     boolean loaded;
@@ -72,7 +72,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
         if (Math.abs(accelZ) > accelThreshold && (Math.abs(accelX) > accelThreshold || Math.abs(accelY) > accelThreshold)) {
             accelString = "High Motion Detected!";
-            Log.i("jerk", ""+accelZ);
+            //Log.i("jerk", ""+accelZ);
             jerkCounter++;
         }
         else{
@@ -92,8 +92,8 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         super.draw(canvas);
         update();
         canvas.drawColor(Color.TRANSPARENT);
-        p.setTextSize(getHeight() / 12);
-        p.setTextAlign(Paint.Align.RIGHT);
+        p.setTextSize(getHeight() / 2);
+        p.setTextAlign(Paint.Align.CENTER);
         p.setAntiAlias(true);
         if (jerkNotify >= 0){
             p.setColor(Color.RED);
@@ -138,24 +138,24 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void loadCamera(SurfaceHolder holder){
+    /*public void loadCamera(SurfaceHolder holder){
         mCamera = Camera.open();
 
-        try{
-            mCamera.setPreviewDisplay(holder); // problem is here
-            Log.i("Dashboard", "Camera display preview set");
-            mCamera.startPreview();
-            Log.i("Camera", "Loaded");
-        }
-        catch (Exception e){
-            Toast t = Toast.makeText(context, "Camera Error! Exiting...", Toast.LENGTH_SHORT);
-            t.show();
-            Log.d("Camera", "Error "+e.toString());
-            /*mCamera.release();
-            mCamera = null;*/
-            ((MainActivity)context).finish();
-        }
-    }
+        try {
+                mCamera.setPreviewDisplay(holder); // problem is here
+                Log.i("Dashboard", "Camera display preview set");
+                mCamera.startPreview();
+                Log.i("Camera", "Loaded");
+            } catch (Exception e) {
+                Toast t = Toast.makeText(context, "Camera Error! Exiting...", Toast.LENGTH_SHORT);
+                t.show();
+                Log.d("Camera", "Error " + e.toString());
+            mCamera.release();
+            mCamera = null;
+                ((MainActivity) context).finish();
+            }
+
+    }*/
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -164,10 +164,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        if (mCamera != null) {
+       /* if (mCamera != null) {
             mCamera.stopPreview();
             mCamera.release();
             mCamera = null;
-        }
+        }*/
     }
 }

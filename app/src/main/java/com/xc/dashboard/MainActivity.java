@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
@@ -40,21 +41,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        try{
-            mCamera = Camera.open();
-        } catch (Exception e){ }
-
-        if(mCamera != null) {
-            mCameraView = new CameraView(this, mCamera);
-            FrameLayout camera_view = (FrameLayout)findViewById(R.id.camera_view);
-            camera_view.addView(mCameraView);
-        }
-
     }
 
     protected void onResume() {
         super.onResume();
         loadSensor();
+        loadCamera();
+        loadOverlay();
     }
 
     protected void onPause() {
@@ -64,6 +57,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void loadSensor(){
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+    }
+
+    public void loadCamera(){
+        try{
+            mCamera = Camera.open();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error opening camera!", Toast.LENGTH_LONG).show();
+        }
+        if(mCamera != null) {
+            mCameraView = new CameraView(this, mCamera);
+            FrameLayout camera_view = (FrameLayout)findViewById(R.id.camera_view);
+            camera_view.addView(mCameraView);
+        }
+    }
+
+    public void loadOverlay(){
+        Log.d("AppView", "Load Overlay");
+        appView = new AppView(this);
+        FrameLayout appView_ = (FrameLayout) findViewById(R.id.appview);
+        if (appView != null) {
+            appView_.addView(appView);
+        }
     }
 
     public void unloadSensor(){
@@ -77,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
         if (appView != null) {
-            Log.d("Sensor", "onSensorChanged");
             appView.accelX = event.values[0];
             appView.accelY = event.values[1];
             appView.accelZ = event.values[2];
@@ -87,5 +101,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void toggleMetric(View button){
+        appView.metric = ((ToggleButton)button).isChecked();
     }
 }

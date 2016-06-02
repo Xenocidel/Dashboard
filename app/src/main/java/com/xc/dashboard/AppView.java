@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.widget.Toolbar;
 
 /**
  * Created by Aaron on 2016-05-23.
@@ -33,13 +36,14 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
     public AppView(Context context, AttributeSet attrs, int defStyle) {
         super(context) ;
-        Log.d("Dashboard", "AppView constructed");
+        Log.d("AppView", "AppView constructed");
         this.context = context;
         getHolder (). addCallback(this);
+        setZOrderOnTop(true);
+        getHolder().setFormat(PixelFormat.TRANSPARENT);
         setFocusable(true);
         ((MainActivity)context).appView = this;
         loaded = false;
-        speedString = (TextView)findViewById(R.id.speedometer);
         jerkCounter = 0;
         jerkNotify = -1;
         p = new Paint();
@@ -51,9 +55,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
     Context context;
     Switch jerkDetectionEnable;
     boolean loaded;
+    boolean metric;
     AppThread appThread;
     Paint p;
-    TextView speedString;
+    String speedString;
     String accelString;
     float speed;
     float accelX;
@@ -91,14 +96,28 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
     public void draw(Canvas canvas){
         super.draw(canvas);
         update();
-        canvas.drawColor(Color.TRANSPARENT);
-        p.setTextSize(getHeight() / 2);
-        p.setTextAlign(Paint.Align.CENTER);
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        p.setTextSize(getHeight() / 12);
+        p.setTextAlign(Paint.Align.RIGHT);
         p.setAntiAlias(true);
         if (jerkNotify >= 0){
             p.setColor(Color.RED);
             canvas.drawText(accelString, getWidth()-10, getHeight()/8, p);
         }
+
+        //temporary
+        speed = 1.0f;
+
+        if (!metric){
+            speedString = "Speed: "+ (int)(speed*=2.23693629);
+        }
+        else{
+            speedString = "Speed: "+ (int)(speed*=3.6);
+        }
+        p.setColor(Color.BLACK);
+        p.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText(speedString, 10, getHeight()/12, p);
+
             /*switch(appThread.getAppState()){
             case LOADING:
 

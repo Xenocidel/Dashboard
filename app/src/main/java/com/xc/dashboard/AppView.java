@@ -99,7 +99,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
             p.setColor(Color.RED);
             canvas.drawText(accelString, getWidth()-10, getHeight()/8, p);
         }
-        /*switch(appThread.getAppState()){
+            /*switch(appThread.getAppState()){
             case LOADING:
 
                 break;

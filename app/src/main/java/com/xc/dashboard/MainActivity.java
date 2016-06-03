@@ -1,5 +1,6 @@
 package com.xc.dashboard;
 
+import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -7,22 +8,34 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
+    LocationManager locationManager;
+    LocationListener locationListener;
     public AppView appView;
+
+    private boolean sensorActive;
+    private boolean speedActive;
 
     private Camera mCamera = null;
     private CameraView mCameraView = null;
@@ -47,16 +60,59 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         loadSensor();
         loadCamera();
+        loadSpeed();
         loadOverlay();
     }
 
     protected void onPause() {
         super.onPause();
         unloadSensor();
+        unloadSpeed();
     }
 
     public void loadSensor(){
+        if (sensorActive)
+            return;
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        sensorActive = true;
+    }
+
+    public void loadSpeed(){
+        if (speedActive)
+            return;
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if (appView != null && location.getAccuracy() < 30) {
+                    Log.d("debug", location.getLongitude()+","+location.getLatitude()+" "+location.getSpeed()+"m/s");
+                    appView.speed = location.getSpeed();
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        }
+        catch (SecurityException e){
+            Toast.makeText(this, "Please enable location services", Toast.LENGTH_LONG).show();
+        }
+        speedActive = true;
     }
 
     public void loadCamera(){
@@ -84,6 +140,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void unloadSensor(){
         mSensorManager.unregisterListener(this);
         Log.i("Dashboard", "Sensors Unloaded");
+        sensorActive = false;
+    }
+
+    public void unloadSpeed(){
+        try {
+            locationManager.removeUpdates(locationListener);
+        }
+        catch (SecurityException e){ }
+        locationManager = null;
+        locationListener = null;
+        Log.i("Dashboard", "Location Unloaded");
+        speedActive = false;
     }
 
     @Override
@@ -106,4 +174,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void toggleMetric(View button){
         appView.metric = ((ToggleButton)button).isChecked();
     }
+
+    public void toggleRecord(View button){
+        appView.record = ((CheckBox)button).isChecked();
+        if (appView.record){
+            Log.i("Dashboard", "Recording started");
+        }
+        else{
+            Log.i("Dashboard", "Recording stopped");
+        }
+    }
+
 }

@@ -8,7 +8,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/appview" />
+        android:id="@+id/appview" >
+
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/camera_view"
@@ -23,7 +25,21 @@
         android:textOn="km/h"
         android:textOff="mph"
         android:onClick="toggleMetric"
-        android:layout_marginTop="35dp" />
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="5dp" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Record"
+        android:id="@+id/record"
+        android:layout_gravity="right|bottom"
+        android:checked="false"
+        android:textStyle="bold"
+        android:textSize="30sp"
+        android:onClick="toggleRecord"
+        android:layout_margin="10dp"
+        android:textColor="#ff0000" />
 
 
 </FrameLayout>

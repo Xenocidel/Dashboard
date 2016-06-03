@@ -56,6 +56,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
     Switch jerkDetectionEnable;
     boolean loaded;
     boolean metric;
+    boolean record;
     AppThread appThread;
     Paint p;
     String speedString;
@@ -105,44 +106,15 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawText(accelString, getWidth()-10, getHeight()/8, p);
         }
 
-        //temporary
-        speed = 1.0f;
-
         if (!metric){
-            speedString = "Speed: "+ (int)(speed*=2.23693629);
+            speedString = "Speed: "+ Math.round(speed*2.23693629);
         }
         else{
-            speedString = "Speed: "+ (int)(speed*=3.6);
+            speedString = "Speed: "+ Math.round(speed*3.6);
         }
         p.setColor(Color.BLACK);
         p.setTextAlign(Paint.Align.LEFT);
         canvas.drawText(speedString, 10, getHeight()/12, p);
-
-            /*switch(appThread.getAppState()){
-            case LOADING:
-
-                break;
-            case CAMERA:
-                //canvas.drawColor(Color.BLACK);
-                ToggleButton metric = (ToggleButton)findViewById(R.id.metric);
-                if (metric.isChecked()){
-                    canvas.drawColor(Color.LTGRAY);
-                }
-                else{
-                    canvas.drawColor(Color.RED);
-                }
-                p.setTextSize(getHeight() / 12);
-                p.setTextAlign(Paint.Align.LEFT);
-                p.setAntiAlias(true);
-                if (jerkNotify >= 0){
-                    p.setColor(Color.RED);
-                    canvas.drawText(accelString, 10, getHeight()/8+10, p);
-                }
-                //jerkDetectionEnable.draw(canvas);
-                break;
-            case RECORD:
-                break;
-        }*/
 
     }
 

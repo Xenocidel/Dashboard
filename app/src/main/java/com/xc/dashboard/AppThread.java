@@ -1,6 +1,7 @@
 package com.xc.dashboard;
 
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 /**
@@ -28,6 +29,7 @@ public class AppThread extends Thread {
                     setAppState(AppState.CAMERA);
                     break;
                 case CAMERA:
+                case RECORD:
                     c = sh.lockCanvas(null);
                     try {
                         synchronized (sh) {
@@ -41,14 +43,11 @@ public class AppThread extends Thread {
                     }
                     // Set the approximate frame rate by setting this delay
                     try {
-                        Thread.sleep(20); //50fps
+                        Thread.sleep(200);
                     } catch (InterruptedException e) {
                         // Thread was interrupted while sleeping.
                         return;
                     }
-                    break;
-                case RECORD:
-
                     break;
             }
         }

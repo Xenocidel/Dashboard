@@ -81,10 +81,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
             seconds = (int)(recordTimer/1000);
             minutes = seconds/60;
             seconds %= 60;
-            if (minutes > 10){
-                recordString = "0:00";
-            }
-            else if (seconds<10)
+            if (seconds<10)
                 recordString = minutes+":0"+seconds;
             else
                 recordString = minutes+":"+seconds;

@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mCameraView.record = ((CheckBox) button).isChecked();
         if (mCameraView.record){
             appView.appThread.setAppState(AppThread.AppState.RECORD);
+            appView.startTime = System.currentTimeMillis();
         }
         else{
             appView.appThread.setAppState(AppThread.AppState.CAMERA);

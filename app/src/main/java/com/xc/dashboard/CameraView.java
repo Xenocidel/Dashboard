@@ -2,10 +2,18 @@ package com.xc.dashboard;
 
 
 import android.content.Context;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.hardware.Camera;
+import android.widget.Toast;
 
+import java.io.Externalizable;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -15,6 +23,12 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
 
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    private boolean cameraEnable;
+    public boolean record; //whether or not the record button is enabled or not
+    private boolean isRecording;
+    private MediaRecorder recorder;
+    private String saveFile;
+    private File recording;
 
     public CameraView(Context context, Camera camera){
         super(context);
@@ -27,10 +41,21 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        try{
+        Log.d("CameraView", "surfaceCreated, cameraEnable:"+cameraEnable);
+        if (!cameraEnable) {
+            try{
+                mCamera = Camera.open();
+            } catch (Exception e) {
+                //Toast.makeText(getContext(), "Error opening camera!", Toast.LENGTH_LONG).show();
+            }
+        }
+        try {
             mCamera.setPreviewDisplay(surfaceHolder);
             mCamera.startPreview();
-        } catch (IOException e) { }
+            cameraEnable = true;
+        } catch (IOException e) {
+            cameraEnable = false;
+        }
     }
 
     @Override
@@ -40,7 +65,79 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        mCamera.stopPreview();
-        mCamera.release();
+        if (cameraEnable) {
+            mCamera.stopPreview();
+            mCamera.release();
+            cameraEnable = false;
+        }
+        Log.d("CameraView", "surfaceDestroyed, cameraEnable:"+cameraEnable);
     }
+
+    public void run(){
+        if (saveFile == null){
+            if (!createFile()) {
+                Toast.makeText(getContext(), "Error saving file!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        if (record){
+            startRecording();
+        }
+        else{
+            stopRecording();
+        }
+    }
+
+    public boolean createFile(){
+        String state = Environment.getExternalStorageState();
+        boolean storageAvail = Environment.MEDIA_MOUNTED.equals(state);
+        if (storageAvail){
+            File tmp = Environment.getExternalStorageDirectory();
+            tmp = new File(tmp.getPath()+"/Dashboard");
+            tmp.mkdir();
+            recording = new File(tmp, "recording.mp4");
+            try{
+                recording.createNewFile();
+                return true;
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+            Log.d("file", "isFile:"+recording.isFile());
+        }
+        return false;
+    }
+
+    public void startRecording(){
+        mCamera.unlock();
+        recorder = new MediaRecorder();
+        recorder.setCamera(mCamera);
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        recorder.setOutputFile(recording.getPath());
+        recorder.setMaxDuration(600000); //10 minutes
+        try{
+            recorder.prepare();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        recorder.start();
+        Log.i("Camera", "Recording to "+recording.getPath());
+        isRecording = true;
+    }
+
+    public void stopRecording(){
+        Log.i("Camera", "Recording stopped");
+        try{
+            if ((recorder != null) && isRecording){
+                isRecording = false;
+                recorder.stop();
+                recorder.release();
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 }

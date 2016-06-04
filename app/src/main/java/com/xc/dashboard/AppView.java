@@ -53,10 +53,13 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
    // public Camera mCamera;
     Context context;
-    Switch jerkDetectionEnable;
+    String recordString;
+    long recordTimer;
+    public long startTime;
+    int seconds;
+    int minutes;
     boolean loaded;
     boolean metric;
-    boolean record;
     AppThread appThread;
     Paint p;
     String speedString;
@@ -74,6 +77,20 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         if (!loaded){
             appThread = new AppThread(this);
             loaded = true;
+        }
+
+        if (appThread.getAppState() == AppThread.AppState.RECORD){
+            recordTimer = System.currentTimeMillis()-startTime;
+            seconds = (int)(recordTimer/1000);
+            minutes = seconds/60;
+            seconds %= 60;
+            if (seconds<10)
+                recordString = minutes+":0"+seconds;
+            else
+                recordString = minutes+":"+seconds;
+            if (minutes==10){
+                ((MainActivity)context).toggleRecord(findViewById(R.id.record));
+            }
         }
 
         if (Math.abs(accelZ) > accelThreshold && (Math.abs(accelX) > accelThreshold || Math.abs(accelY) > accelThreshold)) {
@@ -115,6 +132,11 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         p.setColor(Color.BLACK);
         p.setTextAlign(Paint.Align.LEFT);
         canvas.drawText(speedString, 10, getHeight()/12, p);
+
+        if (appThread.getAppState() == AppThread.AppState.RECORD){
+            p.setColor(Color.RED);
+            canvas.drawText(recordString, 10, getHeight()-getHeight()/12, p);
+        }
 
     }
 

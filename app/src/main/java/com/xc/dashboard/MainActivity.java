@@ -54,14 +54,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+        loadCamera();
+        loadOverlay();
     }
 
     protected void onResume() {
         super.onResume();
         loadSensor();
-        loadCamera();
         loadSpeed();
-        loadOverlay();
     }
 
     protected void onPause() {
@@ -106,8 +106,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         };
         try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 5, locationListener);
         }
         catch (SecurityException e){
             Toast.makeText(this, "Please enable location services", Toast.LENGTH_LONG).show();
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void loadCamera(){
+        Log.d("MainActivity", "loadCamera");
         try{
             mCamera = Camera.open();
         } catch (Exception e) {
@@ -175,14 +176,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         appView.metric = ((ToggleButton)button).isChecked();
     }
 
-    public void toggleRecord(View button){
-        appView.record = ((CheckBox)button).isChecked();
-        if (appView.record){
-            Log.i("Dashboard", "Recording started");
+    public void toggleRecord(View button) {
+        mCameraView.record = ((CheckBox) button).isChecked();
+        if (mCameraView.record){
+            appView.appThread.setAppState(AppThread.AppState.RECORD);
+            appView.startTime = System.currentTimeMillis();
         }
         else{
-            Log.i("Dashboard", "Recording stopped");
+            appView.appThread.setAppState(AppThread.AppState.CAMERA);
         }
+        mCameraView.run();
     }
 
 }

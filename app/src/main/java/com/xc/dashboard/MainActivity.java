@@ -106,8 +106,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         };
         try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 5, locationListener);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 5, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50, 5, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 50, 5, locationListener);
         }
         catch (SecurityException e){
             Toast.makeText(this, "Please enable location services", Toast.LENGTH_LONG).show();
@@ -180,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mCameraView.record = ((CheckBox) button).isChecked();
         if (mCameraView.record){
             appView.appThread.setAppState(AppThread.AppState.RECORD);
-            appView.startTime = System.currentTimeMillis();
         }
         else{
             appView.appThread.setAppState(AppThread.AppState.CAMERA);

@@ -49,9 +49,6 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
         p = new Paint();
     }
 
-
-
-   // public Camera mCamera;
     Context context;
     String recordString;
     long recordTimer;
@@ -84,13 +81,13 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
             seconds = (int)(recordTimer/1000);
             minutes = seconds/60;
             seconds %= 60;
-            if (seconds<10)
+            if (minutes > 10){
+                recordString = "0:00";
+            }
+            else if (seconds<10)
                 recordString = minutes+":0"+seconds;
             else
                 recordString = minutes+":"+seconds;
-            if (minutes==10){
-                ((MainActivity)context).toggleRecord(findViewById(R.id.record));
-            }
         }
 
         if (Math.abs(accelZ) > accelThreshold && (Math.abs(accelX) > accelThreshold || Math.abs(accelY) > accelThreshold)) {

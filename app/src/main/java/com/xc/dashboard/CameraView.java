@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * Created by Jimmy on 2016/6/1.
  */
-public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
+public class CameraView extends SurfaceView implements SurfaceHolder.Callback, MediaRecorder.OnInfoListener{
 
     private SurfaceHolder mHolder;
     private Camera mCamera;
@@ -113,9 +113,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
         recorder.setCamera(mCamera);
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
         recorder.setOutputFile(recording.getPath());
         recorder.setMaxDuration(600000); //10 minutes
+        recorder.setOnInfoListener(this);
         try{
             recorder.prepare();
         } catch (IOException e){
@@ -124,14 +125,17 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
         recorder.start();
         Log.i("Camera", "Recording to "+recording.getPath());
         isRecording = true;
+        ((MainActivity)getContext()).appView.startTime = System.currentTimeMillis();
     }
 
     public void stopRecording(){
         Log.i("Camera", "Recording stopped");
+        Toast.makeText(getContext(), "Recording saved to "+recording.getPath(), Toast.LENGTH_LONG).show();
         try{
             if ((recorder != null) && isRecording){
                 isRecording = false;
                 recorder.stop();
+                recorder.reset();
                 recorder.release();
             }
         }
@@ -140,4 +144,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
         }
     }
 
+    @Override
+    public void onInfo(MediaRecorder mr, int what, int extra) {
+        if(what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED){
+            Log.i("Camera", "Max Duration Reached");
+            mr.stop();
+            mr.reset();
+            mr.release();
+            startRecording();
+        }
+    }
 }
